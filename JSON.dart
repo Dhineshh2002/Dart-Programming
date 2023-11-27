@@ -4,18 +4,24 @@ void main() {
     "age": 28,
     "occupation": {"role": "developer", "tech": "flutter"},
     "person_list": [
-      {"name": "balaji", "age": 25},
+      {
+        "name": "balaji",
+        "age": 25,
+      },
       {"name": "srini", "age": 25, "phone": 6328037835},
       {
-        "name": "dhinesh",
+        "name": 'dhinesh',
         "age": 21,
         "family": {
           "father": {"name": "Ramadoss", "age": 60},
-          "mother": {"name": "Santhi", "age": 55}
+          "mother": {"name": "Santhi", "age": 55},
+          "children": [
+            {"name": "dhinesh"},
+            {"name": "balaji"}
+          ]
         },
       }
     ],
-    "hobbies": ["listeneing music", "coding", "watching movies"],
   };
   print(jsonSample["person_list"][2]["family"]["father"]["name"]);
 
@@ -33,24 +39,25 @@ class MapToObject {
   int? age;
   Occupation? occupation;
   List<Person>? personList;
-  List<String>? hobbies;
 
-  MapToObject(
-      {this.name, this.age, this.occupation, this.personList, this.hobbies});
+  MapToObject({
+    this.name,
+    this.age,
+    this.occupation,
+    this.personList,
+  });
 
   factory MapToObject.fromJson(Map<String, dynamic> json) {
-    // Storing a person_list into List of Maps
     List<Map<String, dynamic>> personMap = json['person_list'];
 
-    // Converting List of Maps into List of Person
     List<Person> persons = personMap.map((e) => Person.fromJson(e)).toList();
 
     return MapToObject(
-        name: json['name'],
-        age: json['age'] is int ? json['age'] : null,
-        occupation: Occupation.fromJson(json['occupation']),
-        personList: persons,
-        hobbies: json['hobbies']);
+      name: json['name'],
+      age: json['age'] is int ? json['age'] : null,
+      occupation: Occupation.fromJson(json['occupation']),
+      personList: persons,
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -60,7 +67,6 @@ class MapToObject {
       'age': age,
       'occupation': occupation?.toJson(),
       'person_list': personJsonList,
-      'hobbies': hobbies
     };
   }
 }
@@ -69,7 +75,10 @@ class Occupation {
   String? role;
   String? tech;
 
-  Occupation({this.role, this.tech});
+  Occupation({
+    this.role,
+    this.tech,
+  });
 
   Occupation.fromJson(Map<String, String> json)
       : role = json['role'],
@@ -89,7 +98,12 @@ class Person {
   int? phone;
   Family? family;
 
-  Person({this.name, this.age, this.phone, this.family});
+  Person({
+    this.name,
+    this.age,
+    this.phone,
+    this.family,
+  });
 
   factory Person.fromJson(Map<String, dynamic> json) {
     return Person(
@@ -113,18 +127,33 @@ class Person {
 class Family {
   FamilyDetail? father;
   FamilyDetail? mother;
+  List<Children>? children;
 
-  Family({this.father, this.mother});
+  Family({
+    this.father,
+    this.mother,
+    this.children,
+  });
 
   factory Family.fromJson(Map<String, dynamic> json) {
+    List<Map<String, dynamic>> childrenDetail = json['children'];
+    List<Children> children =
+        childrenDetail.map((e) => Children.fromJson(e)).toList();
     return Family(
       father: FamilyDetail.fromJson(json['father']),
       mother: FamilyDetail.fromJson(json['mother']),
+      children: children,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'father': father?.toJson(), 'mother': mother?.toJson()};
+    List<Map<String, dynamic>>? child =
+        children?.map((e) => e.toJson()).toList();
+    return {
+      'father': father?.toJson(),
+      'mother': mother?.toJson(),
+      'children': child,
+    };
   }
 }
 
@@ -132,7 +161,10 @@ class FamilyDetail {
   String? name;
   int? age;
 
-  FamilyDetail({this.name, this.age});
+  FamilyDetail({
+    this.name,
+    this.age,
+  });
 
   factory FamilyDetail.fromJson(Map<String, dynamic> json) {
     return FamilyDetail(
@@ -146,5 +178,18 @@ class FamilyDetail {
       'name': name,
       'age': age,
     };
+  }
+}
+
+class Children {
+  String? name;
+  Children({this.name});
+
+  factory Children.fromJson(Map<String, dynamic> json) {
+    return Children(name: json['name']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name};
   }
 }
